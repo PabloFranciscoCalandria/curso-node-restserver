@@ -1,6 +1,10 @@
 const { response, request} = require('express');
+const Usuario = require('../models/usuario');
+const bcryptjs = require('bcryptjs');
 
 const usuariosGet = (req = request, res = response) => {
+
+    
 
     const {vida, defensa = '10'} = req.query; // Si no viene la defensa en la url, por defecto sera 10
 
@@ -11,24 +15,40 @@ const usuariosGet = (req = request, res = response) => {
     });
 }
 
-const usuariosPost = (req = request, res = response) => {
+const usuariosPost = async (req = request, res = response) => {
 
-    const {nombre, edad} = req.body;
+    const {nombre, correo, password, rol} = req.body;
+    const usuario = new Usuario({nombre, correo, password, rol});
 
-    req.status(201).json({
-        msg: 'post API - controlador',
-        nombre,
-        edad
+    // Encriptar la contraseña
+    const salt = bcryptjs.genSaltSync(); 
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    // Guardar en BD
+    await usuario.save();
+
+    res.json({
+        usuario
     })
 }
 
-const usuariosPut = (req, res = response) => {
+const usuariosPut = async (req, res = response) => {
 
-    const {id} = req.params //Id es el nombre del parametro de la ruta solicitada
+    const {id} = req.params; //Id es el nombre del parametro de la ruta solicitada
+    const {__id, password, google, correo, ...resto} = req.body;
+
+    // TODO validar contra base de datos
+    if(password){
+        // Encriptar la contraseña
+        const salt = bcryptjs.genSaltSync(); 
+        resto.password = bcryptjs.hashSync(password, salt);
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate(id, resto);
 
     res.json({
         msg: 'put API - controlador',
-        id
+        usuario
     })
 }
 
