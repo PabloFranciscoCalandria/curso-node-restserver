@@ -3,7 +3,7 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 
 const { validarCampos } = require('../middlewares/validar-campos');
-const { esRoleValido, emailExiste, emailUsuarioPorId} = require('../helpers/db-validators')
+const { esRoleValido, emailExiste, existeUsuarioPorId} = require('../helpers/db-validators')
 
 const { usuariosGet, 
         usuariosPost,
@@ -16,7 +16,7 @@ router.get('/', usuariosGet);
 
 router.put('/:id', [ 
         check('id', 'No es un ID valido').isMongoId(), //Es el id del parametro (/:id)
-        check('id').custom( emailUsuarioPorId ),
+        check('id').custom( existeUsuarioPorId ),
         check('rol').custom( esRoleValido ),
         validarCampos
 ],usuariosPut); //:id parametro de segmento
@@ -31,7 +31,11 @@ router.post('/', [
         validarCampos
 ] ,usuariosPost); //El segundo parametro es para mandar middlewares
 
-router.delete('/', usuariosDelete);
+router.delete('/:id', [
+        check('id', 'No es un ID valido').isMongoId(), 
+        check('id').custom( existeUsuarioPorId ),
+        validarCampos
+] ,usuariosDelete);
 
 
 module.exports = router;
