@@ -17,7 +17,7 @@ const usuariosGet = async (req = request, res = response) => {
     // Al tener dos await!, el problema es que si cada uno, tardara 4 segundos, tengo 8 segundos totales en espera
     // para eso, se hace una promesa donde le paso un arreglo de cada una de las promesas
     // En teoria, deberia tardar menos que hacer dos promesas por separado
-    const [ total, usuarios] = await Promise.all([ // [total, usuarios] Es la destructuracion de devolver toda la respuesta (res)
+    const [ total, usuarios ] = await Promise.all([ // [total, usuarios] Es la destructuracion de devolver toda la respuesta (res)
         Usuario.countDocuments(query),
         Usuario.find(query).skip(Number(desde)).limit(Number(limite))
     ]);
