@@ -5,7 +5,7 @@ const dbConnection = async() => {
     try{
 
         // Coneccion desde el .env
-        await mongoose.connect(process.env.MONGODB_ATLAS || 8080);
+        await mongoose.connect(process.env.MONGODB_ATLAS);
         console.log("Base de datos online");
 
     }catch(error){
